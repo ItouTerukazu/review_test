@@ -1,0 +1,41 @@
+name: Reproduce Gradle dependency-verification cache issue
+on:
+  push:
+    branches:
+      - exp/gradle-dv-cache-20261015
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repro:
+    name: Gradle ${{ matrix.gradle }} / JDK ${{ matrix.java }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - gradle: "9.2.1"
+            java: "25"
+          - gradle: "7.3"
+            java: "17"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "${{ matrix.java }}"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "${{ matrix.gradle }}"
+          cache-disabled: true
+      - name: Cold / warm / refresh with independently isolated strict verification
+        run: bash dv-repro/run.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-verification-gradle-${{ matrix.gradle }}
+          path: dv-repro/output
+          retention-days: 7
