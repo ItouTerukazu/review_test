@@ -16,3 +16,11 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     implementation 'org.apache.commons:commons-text:1.10.0'
 }
+
+// Resolve all compile dependencies under the caller's verification policy.
+tasks.register('resolveDependencies') {
+    doLast {
+        def jars = configurations.compileClasspath.resolve()
+        println("DV_RESOLVED_FILES=" + jars.size())
+    }
+}
