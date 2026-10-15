@@ -1,0 +1,18 @@
+plugins { id 'java' }
+
+repositories {
+    mavenCentral {
+        if (project.hasProperty('pomOnly')) {
+            metadataSources {
+                mavenPom()
+                ignoreGradleMetadataRedirection()
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation platform('org.junit:junit-bom:5.7.0')
+    implementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    implementation 'org.apache.commons:commons-text:1.10.0'
+}
